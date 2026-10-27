@@ -10,6 +10,7 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import checkoutRoutes from './routes/checkoutRoutes.js';
 
 const app = express();
 
@@ -44,7 +45,8 @@ app.get('/', (req, res) => {
       products: '/api/products',
       cart: '/api/cart',
       orders: '/api/orders',
-      users: '/api/users'
+      users: '/api/users',
+      checkout: '/api/checkout'
     }
   });
 });
@@ -55,6 +57,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 // 404 handler
 app.use(notFound);
