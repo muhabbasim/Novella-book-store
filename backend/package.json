@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/utils/seedProducts.js",
-    "init:db": "node src/utils/initDatabase.js"
+    "init:db": "node src/utils/initDatabase.js",
+    "migrate:stripe": "node src/utils/migrateStripe.js"
   },
   "keywords": [
     "express",
@@ -19,13 +20,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.3",
-    "express-session": "^1.17.3",
-    "connect-pg-simple": "^9.0.1",
     "bcryptjs": "^2.4.3",
+    "connect-pg-simple": "^9.0.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "pg": "^8.11.3",
+    "stripe": "^23.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

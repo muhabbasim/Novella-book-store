@@ -22,3 +22,10 @@ const sessionConfig = {
 };
 
 export default sessionConfig;
+
+
+
+// connect-pg-simple
+// This package allows Express sessions to be stored in PostgreSQL
+// connect-pg-simple provides a PostgreSQL-backed session store.
+// Its job is to save, retrieve, update, and delete session records in your database.

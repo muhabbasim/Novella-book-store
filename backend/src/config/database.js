@@ -2,6 +2,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 import pkg from 'pg';
 const { Pool } = pkg;
 
@@ -73,6 +74,9 @@ const initializeTables = async () => {
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         total_amount DECIMAL(10, 2) NOT NULL,
         status VARCHAR(50) DEFAULT 'pending',
+        payment_status VARCHAR(50) DEFAULT 'pending',
+        stripe_session_id VARCHAR(255),
+        stripe_payment_intent_id VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -114,3 +118,7 @@ const initializeTables = async () => {
 };
 
 export { pool, initializeTables };
+
+
+// pg is a Node.js package that allows your backend to communicate with PostgreSQL.
+// It allows you to execute SQL queries, retrieve results, and manage database connections.
