@@ -3,7 +3,7 @@ import ProductCardSkeleton from './ProductCardSkeleton';
 import EmptyState from './EmptyState';
 
 function ProductGrid({ products, loading, onResetFilters }) {
-  const gridClasses = "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 xs:gap-4 sm:gap-4 md:gap-5 lg:gap-6";
+  const gridClasses = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-4 md:gap-5 lg:gap-6";
 
   if (loading) {
     return (

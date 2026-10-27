@@ -41,7 +41,8 @@ This opens your browser to authenticate with your Stripe account.
 **Important:** Keep this terminal running while testing!
 
 ```bash
-stripe listen --forward-to localhost:5001/api/webhooks/stripe
+stripe listen --forward-to localhost:5001/api/webhooks/stripe --all-thin
+
 ```
 
 This command will:

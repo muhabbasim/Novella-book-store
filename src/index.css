@@ -46,7 +46,9 @@
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.01em;
   }
-  
+  button {
+    cursor: pointer
+  }
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
@@ -200,5 +202,15 @@
     .xs\:gap-4 { gap: 1rem; }
     .xs\:inline { display: inline; }
     .xs\:hidden { display: none; }
+  }
+
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
