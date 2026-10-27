@@ -198,14 +198,8 @@ export const getCheckoutStatus = async (req, res) => {
       });
     }
 
-    // Retrieve session from Stripe to get latest payment status
-    let stripeSession = null;
-    try {
-      stripeSession = await stripeService.retrieveSession(session_id);
-    } catch (error) {
-      console.error('Error retrieving Stripe session:', error.message);
-    }
-
+    // Return order status from database only
+    // Webhook should update this when payment completes
     return res.status(200).json({
       success: true,
       order: {
@@ -215,7 +209,6 @@ export const getCheckoutStatus = async (req, res) => {
         totalAmount: order.total_amount,
         createdAt: order.created_at,
       },
-      stripeStatus: stripeSession ? stripeSession.payment_status : null,
     });
 
   } catch (error) {

@@ -23,7 +23,6 @@ const stripeService = {
   }) {
     try {
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
         success_url: successUrl,
@@ -36,8 +35,10 @@ const stripeService = {
         },
         // Enable billing address collection
         billing_address_collection: 'required',
-        // Shipping is handled separately in our app
-        shipping_address_collection: null,
+        // Collect shipping address for delivery
+        shipping_address_collection: {
+          allowed_countries: ['SA'], // Saudi Arabia
+        },
         // Expire session after 30 minutes
         expires_at: Math.floor(Date.now() / 1000) + 1800,
       });

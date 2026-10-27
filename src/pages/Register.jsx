@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function Register() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, isAuthenticated, loading } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +14,13 @@ function Register() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
