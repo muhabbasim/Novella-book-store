@@ -7,9 +7,18 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "seed": "node src/utils/seedProducts.js",
-    "init:db": "node src/utils/initDatabase.js",
-    "migrate:stripe": "node src/utils/migrateStripe.js"
+    "seed:dev": "node src/utils/seedProducts.js",
+    "seed:prod": "node src/utils/seedProductionProducts.js",
+    "seed:prod:fresh": "node src/utils/clearProductionProducts.js && node src/utils/seedProductionProducts.js",
+    "clear:prod": "node src/utils/clearProductionProducts.js",
+    "init:db:dev": "node src/utils/initDatabase.js",
+    "init:db:prod": "node --env-file=.env.production src/utils/initDatabase.js",
+    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
+    "test:watch": "NODE_ENV=test jest --watch",
+    "test:coverage": "NODE_ENV=test jest --coverage --detectOpenHandles --forceExit",
+    "test:phase1": "NODE_ENV=test jest --testPathPattern=__tests__/phase1 --detectOpenHandles --forceExit",
+    "test:critical": "NODE_ENV=test jest __tests__/phase1/critical.test.js --detectOpenHandles --forceExit",
+    "test:fast": "NODE_ENV=test jest --maxWorkers=50% --bail --detectOpenHandles --forceExit"
   },
   "keywords": [
     "express",
@@ -30,6 +39,9 @@
     "stripe": "^23.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.4"
   }
 }
