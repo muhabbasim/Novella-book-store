@@ -8,6 +8,9 @@ import Home from '../pages/Home';
 import Product from '../pages/Product';
 import CartPage from '../pages/CartPage';
 import Checkout from '../pages/Checkout';
+import CheckoutStripe from '../pages/CheckoutStripe';
+import CheckoutSuccess from '../pages/CheckoutSuccess';
+import CheckoutCancel from '../pages/CheckoutCancel';
 import Orders from '../pages/Orders';
 import OrderDetail from '../pages/OrderDetail';
 import Login from '../pages/Login';
@@ -42,7 +45,23 @@ function MainLayout() {
             path="/checkout" 
             element={
               <ProtectedRoute>
-                <Checkout />
+                <CheckoutStripe />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/checkout/success" 
+            element={
+              <ProtectedRoute>
+                <CheckoutSuccess />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/checkout/cancel" 
+            element={
+              <ProtectedRoute>
+                <CheckoutCancel />
               </ProtectedRoute>
             } 
           />

@@ -273,5 +273,203 @@ Now that the backend is complete, we'll update the frontend:
 
 ---
 
-**Last Updated:** Step 3 Completed
-**Ready for:** Step 4 - Frontend Integration
+## Step 4: Frontend Integration ✅ COMPLETED
+
+### Changes Made:
+
+#### 1. Updated API Service
+**File:** `src/services/api.js`
+
+Added checkout endpoints:
+- ✅ `checkoutAPI.createCheckoutSession()` - Create Stripe session
+- ✅ `checkoutAPI.getCheckoutStatus(sessionId)` - Verify payment status
+
+#### 2. Created Stripe Checkout Page
+**File:** `src/pages/CheckoutStripe.jsx`
+
+Features:
+- ✅ Displays order summary with cart items
+- ✅ Shows customer information
+- ✅ Secure payment badge with Stripe branding
+- ✅ "Proceed to Payment" button redirects to Stripe
+- ✅ Loading state during redirect
+- ✅ Error handling with user-friendly messages
+- ✅ Empty cart validation
+- ✅ Back to cart navigation
+
+#### 3. Created Success Page
+**File:** `src/pages/CheckoutSuccess.jsx`
+
+Features:
+- ✅ Reads `session_id` from URL query parameter
+- ✅ Verifies payment with backend before showing success
+- ✅ **Retry logic** (5 attempts, 2s delay) for webhook processing delays
+- ✅ Three states: verifying, success, pending, error
+- ✅ Displays order number, date, status, and amount
+- ✅ Success animation with checkmark
+- ✅ "What happens next" information
+- ✅ Links to order details and continue shopping
+- ✅ Automatically clears cart on success
+
+**Security:**
+- Never trusts URL alone for payment confirmation
+- Always verifies with backend `/api/checkout/status`
+- Handles webhook processing delays gracefully
+- Shows appropriate messages for each state
+
+#### 4. Created Cancel Page
+**File:** `src/pages/CheckoutCancel.jsx`
+
+Features:
+- ✅ Friendly cancellation message
+- ✅ Displays preserved cart items
+- ✅ Explanation of what happened
+- ✅ No charges message for reassurance
+- ✅ Quick retry button
+- ✅ Links to review cart or continue shopping
+- ✅ Help/support section
+
+#### 5. Updated Routes
+**File:** `src/layouts/MainLayout.jsx`
+
+New routes:
+- ✅ `/checkout` → CheckoutStripe (protected)
+- ✅ `/checkout/success` → CheckoutSuccess (protected)
+- ✅ `/checkout/cancel` → CheckoutCancel (protected)
+
+#### 6. Updated Styles
+**File:** `src/index.css`
+
+Added:
+- ✅ `animate-scale-in` for success icon animation
+- ✅ Respects `prefers-reduced-motion`
+
+### User Flow:
+
+```
+1. User adds books to cart
+   ↓
+2. Clicks "Proceed to Checkout"
+   ↓
+3. CheckoutStripe page shows order summary
+   ↓
+4. Clicks "Proceed to Payment"
+   ↓
+5. Frontend calls POST /api/checkout
+   ↓
+6. Backend creates Stripe session & pending order
+   ↓
+7. User redirected to Stripe Checkout
+   ↓
+8. User enters payment details (card)
+   ↓
+9. Stripe processes payment
+   ↓
+10. Stripe redirects to /checkout/success?session_id=xxx
+   ↓
+11. Success page calls GET /api/checkout/status
+   ↓
+12. Backend verifies webhook processed the payment
+   ↓
+13. Success page shows confirmation (or retries if pending)
+   ↓
+14. User can view order details or continue shopping
+```
+
+### Cancel Flow:
+
+```
+1. User on Stripe Checkout page
+   ↓
+2. Clicks browser back or "Cancel"
+   ↓
+3. Stripe redirects to /checkout/cancel
+   ↓
+4. Cancel page shows preserved cart
+   ↓
+5. User can retry or continue shopping
+```
+
+### Key Features:
+
+✅ **Security:**
+- Payment verification always done server-side
+- Never trusts frontend or URL parameters alone
+- Session ID validated against user's order
+
+✅ **User Experience:**
+- Clear loading states
+- Informative error messages
+- Smooth animations
+- Preserved cart on cancellation
+- Retry logic for webhook delays
+
+✅ **Reliability:**
+- Handles webhook processing delays
+- Graceful error handling
+- Network error resilience
+- Multiple retry attempts
+
+✅ **Design:**
+- Consistent with Novella brand
+- Green theme maintained
+- Responsive layouts
+- Accessible components
+
+---
+
+## 🎉 Full Stack Stripe Integration Complete!
+
+### Backend (Complete):
+- ✅ Database schema with Stripe columns
+- ✅ Stripe service wrapper
+- ✅ Checkout session endpoint
+- ✅ Webhook handler with signature verification
+- ✅ Status verification endpoint
+- ✅ Idempotent payment processing
+- ✅ Automatic cart clearing
+- ✅ Stock quantity updates
+
+### Frontend (Complete):
+- ✅ Stripe checkout page with order summary
+- ✅ Success page with payment verification
+- ✅ Cancel page with cart preservation
+- ✅ API integration with new endpoints
+- ✅ Loading states and error handling
+- ✅ Smooth animations and UX
+
+---
+
+## Next Steps for Testing:
+
+### 1. Start Backend Server
+```bash
+cd backend
+npm run dev
+```
+
+### 2. Start Stripe Webhook Forwarding
+```bash
+stripe listen --forward-to localhost:5001/api/webhooks/stripe
+# Copy webhook secret to backend/.env
+```
+
+### 3. Start Frontend
+```bash
+npm run dev
+```
+
+### 4. Test Complete Flow
+1. Add books to cart
+2. Go to checkout
+3. Click "Proceed to Payment"
+4. Use test card: 4242 4242 4242 4242
+5. Complete payment
+6. Verify success page shows order
+7. Check order in database is marked as paid
+
+---
+
+**Last Updated:** Step 4 Completed  
+**Status:** ✅ Full Stripe Integration Complete  
+**Ready for:** Testing & Deployment

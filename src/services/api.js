@@ -217,3 +217,27 @@ export const userAPI = {
     });
   },
 };
+
+// ============================================
+// CHECKOUT API (Stripe Integration)
+// ============================================
+
+export const checkoutAPI = {
+  /**
+   * Create Stripe Checkout Session
+   * Returns sessionUrl to redirect user to Stripe
+   */
+  createCheckoutSession: async () => {
+    return fetchAPI('/api/checkout', {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * Get checkout status by Stripe session ID
+   * Used by success page to verify payment
+   */
+  getCheckoutStatus: async (sessionId) => {
+    return fetchAPI(`/api/checkout/status?session_id=${sessionId}`);
+  },
+};
