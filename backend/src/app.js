@@ -11,6 +11,7 @@ import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import checkoutRoutes from './routes/checkoutRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
 
 const app = express();
 
@@ -28,6 +29,12 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
+
+// IMPORTANT: Webhook route must be registered BEFORE express.json()
+// because Stripe signature verification requires the raw body
+app.use('/api/webhooks', webhookRoutes);
+
+// JSON parsing for all other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,7 +53,8 @@ app.get('/', (req, res) => {
       cart: '/api/cart',
       orders: '/api/orders',
       users: '/api/users',
-      checkout: '/api/checkout'
+      checkout: '/api/checkout',
+      webhooks: '/api/webhooks/stripe'
     }
   });
 });

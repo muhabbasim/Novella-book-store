@@ -132,23 +132,146 @@ Added:
 
 ---
 
-## Next Steps:
+## Step 3: Stripe Webhook Handler ✅ COMPLETED
 
-### Step 3: Stripe Webhook Handler
-- Create POST /api/webhooks/stripe endpoint
-- Verify webhook signatures
-- Handle checkout.session.completed event
-- Update order payment status
-- Clear cart on successful payment
-- Make webhook idempotent
+### Changes Made:
 
-### Step 4: Frontend Integration
-- Update Checkout page to use new endpoint
-- Create Success page (handles return from Stripe)
-- Create Cancel page (handles cancelled payments)
-- Update order pages with payment status
+#### 1. Created Webhook Controller
+**File:** `backend/src/controllers/webhookController.js`
+
+Features:
+- ✅ Webhook signature verification using raw body
+- ✅ Event handler for `checkout.session.completed`
+- ✅ Event handler for `checkout.session.async_payment_succeeded`
+- ✅ Event handler for `checkout.session.async_payment_failed`
+- ✅ Event handler for `checkout.session.expired`
+- ✅ Idempotent processing (duplicate webhooks safely ignored)
+- ✅ Automatic cart clearing on successful payment
+- ✅ Stock quantity updates
+- ✅ Comprehensive logging
+
+#### 2. Created Raw Body Middleware
+**File:** `backend/src/middleware/rawBody.js`
+
+- ✅ Preserves raw request body for signature verification
+- ✅ Applied only to webhook route
+- ✅ Compatible with JSON parsing for other routes
+
+#### 3. Created Webhook Routes
+**File:** `backend/src/routes/webhookRoutes.js`
+
+- ✅ `POST /api/webhooks/stripe` endpoint
+- ✅ Uses raw body middleware
+- ✅ No authentication (verified by Stripe signature)
+
+#### 4. Updated App Configuration
+**File:** `backend/src/app.js`
+
+Critical changes:
+- ✅ Webhook route registered **BEFORE** `express.json()`
+- ✅ Ensures raw body available for signature verification
+- ✅ Imported webhook routes
+- ✅ Updated endpoints list
+
+### Webhook Event Flow:
+
+```
+1. User completes payment on Stripe Checkout
+   ↓
+2. Stripe sends webhook: checkout.session.completed
+   ↓
+3. Backend verifies webhook signature
+   ↓
+4. Checks payment_status === 'paid'
+   ↓
+5. Updates order: payment_status = 'paid', status = 'completed'
+   ↓
+6. Adds stripe_payment_intent_id to order
+   ↓
+7. Updates product stock quantities
+   ↓
+8. Clears user's cart
+   ↓
+9. Returns 200 to Stripe
+```
+
+### Idempotency Handling:
+
+```javascript
+// Duplicate webhooks are safely handled:
+if (existingOrder.payment_status === 'paid') {
+  console.log('Order already marked as paid, skipping');
+  return; // Don't process again
+}
+```
+
+### Security Features:
+- ✅ Webhook signature verification (STRIPE_WEBHOOK_SECRET)
+- ✅ Raw body preservation for signature check
+- ✅ Payment status validation before updating
+- ✅ Order existence verification
+- ✅ Idempotent processing
+- ✅ Transaction safety in order updates
+- ✅ Comprehensive error handling
+- ✅ Proper HTTP status codes for Stripe retry logic
+
+### Webhook Events Supported:
+
+| Event | Description | Action |
+|-------|-------------|--------|
+| `checkout.session.completed` | Payment succeeded immediately | Mark order as paid, clear cart |
+| `checkout.session.async_payment_succeeded` | Delayed payment succeeded | Mark order as paid, clear cart |
+| `checkout.session.async_payment_failed` | Delayed payment failed | Mark order as failed |
+| `checkout.session.expired` | Session expired (30 min/24h) | Mark pending order as failed |
+
+### Testing:
+- ✅ Backend server starts successfully
+- ✅ Webhook endpoint registered at `/api/webhooks/stripe`
+- ✅ Raw body middleware applied correctly
+- ✅ Ready for Stripe CLI testing
+
+### Documentation Created:
+- ✅ `backend/WEBHOOK_TESTING.md` - Complete testing guide
+  - Local development setup
+  - Stripe CLI installation & usage
+  - Complete payment flow testing
+  - Troubleshooting guide
+  - Production deployment instructions
 
 ---
 
-**Last Updated:** Step 2 Completed
-**Ready for:** Step 3 - Stripe Webhook Handler
+## Next Steps:
+
+### Step 4: Frontend Integration
+Now that the backend is complete, we'll update the frontend:
+
+1. **Update Checkout Page**
+   - Replace current order creation with Stripe checkout
+   - Redirect to Stripe Checkout URL
+   - Show loading states
+
+2. **Create Success Page**
+   - `/checkout/success?session_id=xxx`
+   - Poll `/api/checkout/status` endpoint
+   - Show order confirmation
+   - Handle pending payment states
+
+3. **Create Cancel Page**
+   - `/checkout/cancel`
+   - Show cancellation message
+   - Preserve cart items
+   - Allow retry
+
+4. **Update Order Pages**
+   - Display payment status badges
+   - Show Stripe payment details
+   - Add "View Receipt" links
+
+5. **Update API Service**
+   - Add checkout endpoint to `services/api.js`
+   - Add status check endpoint
+
+---
+
+**Last Updated:** Step 3 Completed
+**Ready for:** Step 4 - Frontend Integration
