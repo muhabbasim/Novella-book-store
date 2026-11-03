@@ -72,9 +72,42 @@ export const validateCartItem = (req, res, next) => {
   if (quantity !== undefined) {
     if (!Number.isInteger(Number(quantity)) || Number(quantity) < 1) {
       errors.push('Quantity must be a positive integer');
-    } else if (Number(quantity) > 99) {
-      errors.push('Quantity cannot exceed 99');
+    } else if (Number(quantity) > 999) {
+      errors.push('Quantity cannot exceed 999');
     }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors
+    });
+  }
+
+  next();
+};
+
+export const validateCartUpdate = (req, res, next) => {
+  const { quantity } = req.body;
+  const { productId } = req.params;
+  const errors = [];
+
+  if (!productId) {
+    errors.push('Product ID is required');
+  } else if (!Number.isInteger(Number(productId)) || Number(productId) <= 0) {
+    errors.push('Invalid product ID');
+  }
+
+  if (quantity === undefined) {
+    errors.push('Quantity is required');
+  } else if (!Number.isInteger(Number(quantity)) || Number(quantity) < 1) {
+    return res.status(400).json({
+      success: false,
+      message: 'Quantity must be at least 1'
+    });
+  } else if (Number(quantity) > 999) {
+    errors.push('Quantity cannot exceed 999');
   }
 
   if (errors.length > 0) {

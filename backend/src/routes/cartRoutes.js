@@ -7,7 +7,7 @@ import {
   clearCart
 } from '../controllers/cartController.js';
 import { requireAuth } from '../middleware/auth.js';
-import { validateCartItem } from '../middleware/validation.js';
+import { validateCartItem, validateCartUpdate } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.use(requireAuth);
 
 router.get('/', getCart);
 router.post('/', validateCartItem, addToCart);
-router.put('/:productId', validateCartItem, updateCartItem);
+router.put('/:productId', validateCartUpdate, updateCartItem);
 router.delete('/:productId', removeFromCart);
 router.delete('/', clearCart);
 

@@ -1,17 +1,9 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, test, expect, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../../src/app.js';
-import { setupTestDatabase, teardownTestDatabase, createTestUser, getSessionCookie } from '../setup.js';
+import { setupTestDatabase, createTestUser, getSessionCookie } from '../helpers/test-helpers.js';
 
 describe('Phase 1: Authentication Tests', () => {
-  beforeAll(async () => {
-    await setupTestDatabase();
-  });
-
-  afterAll(async () => {
-    await teardownTestDatabase();
-  });
-
   beforeEach(async () => {
     await setupTestDatabase();
   });

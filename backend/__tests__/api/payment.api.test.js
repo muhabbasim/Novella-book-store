@@ -1,28 +1,20 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, test, expect, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../../src/app.js';
+import { pool } from '../../src/config/database.js';
 import { 
   setupTestDatabase, 
-  teardownTestDatabase, 
   createTestUser, 
   createTestProduct,
   addTestCartItem,
   getSessionCookie 
-} from '../setup.js';
+} from '../helpers/test-helpers.js';
 
 describe('Phase 1: Payment Processing Tests', () => {
   let authUser;
   let sessionCookie;
   let testProduct1;
   let testProduct2;
-
-  beforeAll(async () => {
-    await setupTestDatabase();
-  });
-
-  afterAll(async () => {
-    await teardownTestDatabase();
-  });
 
   beforeEach(async () => {
     await setupTestDatabase();
@@ -123,6 +115,11 @@ describe('Phase 1: Payment Processing Tests', () => {
       // Order should exist with correct total
       const expectedTotal = (199.99 * 2) + (29.99 * 3);
       expect(response.body).toHaveProperty('orderId');
+
+      const order = await pool.query('SELECT total_amount FROM orders WHERE id = $1', [
+        response.body.orderId,
+      ]);
+      expect(parseFloat(order.rows[0].total_amount)).toBeCloseTo(expectedTotal, 2);
     });
 
     test('should create pending order in database', async () => {
@@ -172,15 +169,12 @@ describe('Phase 1: Payment Processing Tests', () => {
         .expect(200);
 
       // Stock should remain unchanged until webhook confirms payment
-      const { pool } = await import('../../src/config/database.js');
       const stockCheck = await pool.query(
         'SELECT stock_quantity FROM products WHERE id = $1',
         [testProduct1.id]
       );
 
-      // Stock is reduced during order creation, but this might vary by implementation
-      // If your implementation waits for webhook, uncomment below:
-      // expect(stockCheck.rows[0].stock_quantity).toBe(initialStock);
+      expect(stockCheck.rows[0].stock_quantity).toBe(initialStock);
     });
 
     test('should require authentication', async () => {
@@ -329,7 +323,6 @@ describe('Phase 1: Payment Processing Tests', () => {
       await addTestCartItem(authUser.id, testProduct1.id, 5);
 
       // Manually reduce stock to less than cart quantity
-      const { pool } = await import('../../src/config/database.js');
       await pool.query(
         'UPDATE products SET stock_quantity = 2 WHERE id = $1',
         [testProduct1.id]

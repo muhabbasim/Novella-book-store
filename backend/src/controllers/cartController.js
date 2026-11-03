@@ -33,8 +33,13 @@ export const addToCart = asyncHandler(async (req, res) => {
     });
   }
 
-  // Check stock availability
-  if (product.stock_quantity < quantity) {
+  // Get current quantity in cart if item already exists
+  const existingItem = await cartModel.getCartItem(userId, productId);
+  const currentQuantity = existingItem ? existingItem.quantity : 0;
+  const newTotalQuantity = currentQuantity + quantity;
+
+  // Check stock availability for cumulative quantity
+  if (product.stock_quantity < newTotalQuantity) {
     return res.status(400).json({
       success: false,
       message: `Only ${product.stock_quantity} items available in stock`
@@ -69,6 +74,15 @@ export const updateCartItem = asyncHandler(async (req, res) => {
     return res.status(400).json({
       success: false,
       message: 'Quantity must be at least 1'
+    });
+  }
+
+  // Check if item exists in cart first
+  const existingItem = await cartModel.getCartItem(userId, productId);
+  if (!existingItem) {
+    return res.status(404).json({
+      success: false,
+      message: 'Item not found in cart'
     });
   }
 

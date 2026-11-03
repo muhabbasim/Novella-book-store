@@ -13,12 +13,13 @@
     "clear:prod": "node src/utils/clearProductionProducts.js",
     "init:db:dev": "node src/utils/initDatabase.js",
     "init:db:prod": "node --env-file=.env.production src/utils/initDatabase.js",
-    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit",
-    "test:watch": "NODE_ENV=test jest --watch",
-    "test:coverage": "NODE_ENV=test jest --coverage --detectOpenHandles --forceExit",
-    "test:phase1": "NODE_ENV=test jest --testPathPattern=__tests__/phase1 --detectOpenHandles --forceExit",
-    "test:critical": "NODE_ENV=test jest __tests__/phase1/critical.test.js --detectOpenHandles --forceExit",
-    "test:fast": "NODE_ENV=test jest --maxWorkers=50% --bail --detectOpenHandles --forceExit"
+    "test:db:create": "node src/utils/createTestDatabase.js",
+    "test:db:init": "NODE_ENV=test node src/utils/initTestDatabase.js",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --forceExit",
+    "test:watch": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --watch --runInBand",
+    "test:coverage": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --coverage --runInBand --forceExit",
+    "test:phase1": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=__tests__/phase1 --runInBand --forceExit",
+    "test:critical": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest __tests__/phase1/critical.test.js --runInBand --forceExit"
   },
   "keywords": [
     "express",

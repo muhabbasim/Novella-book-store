@@ -26,6 +26,16 @@ const cartModel = {
     return result.rows;
   },
 
+  // Get specific cart item
+  async getCartItem(userId, productId) {
+    const result = await pool.query(
+      `SELECT * FROM carts 
+       WHERE user_id = $1 AND product_id = $2`,
+      [userId, productId]
+    );
+    return result.rows[0];
+  },
+
   // Add item to cart (or update if exists)
   async addItem(userId, productId, quantity) {
     const result = await pool.query(

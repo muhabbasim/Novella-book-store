@@ -1,28 +1,19 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, test, expect, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import app from '../../src/app.js';
 import { 
   setupTestDatabase, 
-  teardownTestDatabase, 
   createTestUser, 
   createTestProduct,
   addTestCartItem,
   getSessionCookie 
-} from '../setup.js';
+} from '../helpers/test-helpers.js';
 
 describe('Phase 1: Cart Functionality Tests', () => {
   let authUser;
   let sessionCookie;
   let testProduct1;
   let testProduct2;
-
-  beforeAll(async () => {
-    await setupTestDatabase();
-  });
-
-  afterAll(async () => {
-    await teardownTestDatabase();
-  });
 
   beforeEach(async () => {
     await setupTestDatabase();
