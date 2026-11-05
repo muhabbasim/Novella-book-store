@@ -5,9 +5,6 @@
 ```bash
 # Install dependencies
 npm install
-
-# Install Playwright browsers
-npx playwright install chromium
 ```
 
 ## Run Tests
@@ -17,14 +14,47 @@ npx playwright install chromium
 npm test
 ```
 
-### E2E Tests (Full Journey - Requires Backend)
+### Watch Mode (Development)
 ```bash
-# Terminal 1: Start backend
-cd backend && npm run dev
-
-# Terminal 2: Run E2E tests
-npm run test:e2e
+npm test -- --watch
 ```
+
+## Debug Tests
+
+### Vitest UI
+```bash
+npm run test:ui
+```
+
+### Run Single Test
+```bash
+npm test cart.test.jsx
+```
+
+## Test Coverage
+
+✅ **Unit & Component tests**
+- Cart functionality tests
+- Authentication tests  
+- Checkout validation tests
+- Product browsing tests
+
+## Production Build
+
+```bash
+npm run build
+```
+
+## Before Deployment
+
+```bash
+# Run all checks
+npm test && npm run build
+```
+
+## Need Help?
+
+See full guide: **TEST_GUIDE.md**
 
 ### Watch Mode (Development)
 ```bash

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This testing suite provides **production-focused coverage** for the 10 most critical customer scenarios. The suite is minimal, deterministic, and focuses on genuine production risks.
+This testing suite provides **production-focused coverage** for critical customer scenarios using unit and component tests. The suite is minimal, deterministic, and focuses on genuine production risks.
 
 ## Test Structure
 
@@ -17,9 +17,6 @@ This testing suite provides **production-focused coverage** for the 10 most crit
 │       ├── auth.test.jsx             # Authentication tests
 │       ├── checkout.test.jsx         # Checkout flow tests
 │       └── products.test.jsx         # Product browsing tests
-├── e2e/
-│   └── critical-journey.spec.js      # End-to-end customer journey
-├── playwright.config.js              # Playwright configuration
 └── TEST_GUIDE.md                     # This file
 ```
 
@@ -27,7 +24,6 @@ This testing suite provides **production-focused coverage** for the 10 most crit
 
 - **Vitest** - Fast unit and component testing
 - **React Testing Library** - Component testing without implementation details
-- **Playwright** - Reliable E2E testing for critical flows
 - **jsdom** - Browser environment simulation
 
 ## Test Coverage by Scenario
@@ -47,30 +43,30 @@ This testing suite provides **production-focused coverage** for the 10 most crit
 - Calculate totals correctly
 
 ### ✅ Scenario 3: Cart Persistence
-**Location**: `src/test/unit/cart.test.jsx` + `e2e/critical-journey.spec.js`
+**Location**: `src/test/unit/cart.test.jsx`
 - localStorage persistence
 - Cart restoration on page load
 - Survives browser refresh
 
 ### ✅ Scenario 4: Authentication
-**Location**: `src/test/component/auth.test.jsx` + `e2e/critical-journey.spec.js`
+**Location**: `src/test/component/auth.test.jsx`
 - Registration flow
 - Login flow
 - Error handling
 - Session persistence
 
 ### ✅ Scenario 5: Protected Routes
-**Location**: `src/test/component/auth.test.jsx` + `e2e/critical-journey.spec.js`
+**Location**: `src/test/component/auth.test.jsx`
 - Redirect unauthenticated users
 - Allow authenticated access
 
 ### ✅ Scenario 6: Checkout Validation
-**Location**: `src/test/component/checkout.test.jsx` + `e2e/critical-journey.spec.js`
+**Location**: `src/test/component/checkout.test.jsx`
 - Empty cart prevention
 - Order summary accuracy
 
 ### ✅ Scenario 7: Stripe Checkout
-**Location**: `src/test/component/checkout.test.jsx` + `e2e/critical-journey.spec.js`
+**Location**: `src/test/component/checkout.test.jsx`
 - Session creation
 - Redirect to Stripe
 - Cancellation handling
@@ -82,14 +78,8 @@ This testing suite provides **production-focused coverage** for the 10 most crit
 - Display order information
 - Handle verification errors
 
-### ✅ Scenario 9: Navigation
-**Location**: `e2e/critical-journey.spec.js`
-- Direct URLs work
-- Browser back/forward
-- Page refresh maintains state
-
 ### ✅ Scenario 10: Error Handling
-**Location**: `src/test/component/checkout.test.jsx` + `e2e/critical-journey.spec.js`
+**Location**: `src/test/component/checkout.test.jsx`
 - API failures
 - Loading states
 - Error messages
@@ -103,337 +93,244 @@ npm install
 
 ### Run All Tests
 ```bash
-# Unit and component tests
 npm test
+```
 
-# E2E tests (starts dev server automatically)
-npm run test:e2e
-
+### Run All Tests
+```bash
 # Run all tests
-npm test && npm run test:e2e
+npm test && npm run build
 ```
 
-### Interactive Test Modes
+## Interactive Testing
+
+### Vitest UI
 ```bash
-# Vitest UI (interactive test runner)
 npm run test:ui
-
-# Playwright UI (visual test debugging)
-npm run test:e2e:ui
-
-# Playwright headed mode (see browser)
-npm run test:e2e:headed
 ```
 
-### Watch Mode
+### Run Single Test
 ```bash
-# Watch unit tests during development
-npm test -- --watch
-
-# Watch specific test file
-npm test -- cart.test.jsx --watch
+npm test cart.test.jsx
 ```
 
-### Coverage Reports
-```bash
-# Generate coverage report
-npm run test:coverage
+## Test Philosophy
 
-# View coverage in browser
-open coverage/index.html
-```
+### What We Test
+- **Critical user flows**: Registration, login, cart, checkout
+- **Edge cases**: Empty states, error conditions
+- **Business logic**: Cart calculations, price totals
+- **Component behavior**: User interactions, state changes
 
-## Environment Setup
+### What We Don't Test
+- Implementation details (private methods, state structure)
+- Third-party libraries (React, React Router)
+- Styling and CSS
+- Content that's unlikely to break
 
-### Required Environment Variables
-
-Create `.env` file in the root:
-```
-VITE_API_URL=http://localhost:5001
-```
-
-### Backend Requirements
-
-For full E2E testing, the backend must be running:
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-The backend should be running on `http://localhost:5001`.
-
-### Stripe Test Mode
-
-E2E tests that interact with Stripe require:
-- Backend Stripe webhook configured
-- Use Stripe test card: `4242 4242 4242 4242`
-- See `backend/docs/stripe-docs/STRIPE_SETUP.md`
+### Testing Principles
+- **Fast**: All tests run in < 5 seconds
+- **Deterministic**: No flaky tests, no random data
+- **Focused**: Test behavior, not implementation
+- **Maintainable**: Clear test names, minimal setup
 
 ## Test Patterns
 
-### Unit Tests (Vitest)
+### Unit Tests
+
+Unit tests focus on isolated logic without rendering components:
 
 ```javascript
-describe('Feature Name', () => {
-  it('should do something specific', () => {
-    // Arrange
-    const input = createTestData();
-    
-    // Act
-    const result = functionUnderTest(input);
-    
-    // Assert
-    expect(result).toBe(expected);
+import { describe, it, expect } from 'vitest';
+import { calculateTotal } from '../utils/cart';
+
+describe('Cart calculations', () => {
+  it('calculates total correctly', () => {
+    const items = [
+      { price: 10, quantity: 2 },
+      { price: 15, quantity: 1 }
+    ];
+    expect(calculateTotal(items)).toBe(35);
   });
 });
 ```
 
-### Component Tests (React Testing Library)
+### Component Tests
+
+Component tests render components and test user interactions:
 
 ```javascript
-import { renderWithProviders } from '../test-utils';
+import { render, screen, fireEvent } from '../test-utils';
+import ProductCard from '../../components/ProductCard';
 
-it('should render and interact', async () => {
-  const user = userEvent.setup();
-  renderWithProviders(<Component />);
+it('adds product to cart when button clicked', () => {
+  render(<ProductCard product={mockProduct} />);
   
-  // Find elements
-  const button = screen.getByRole('button', { name: /click me/i });
+  const button = screen.getByRole('button', { name: /add to cart/i });
+  fireEvent.click(button);
   
-  // Interact
-  await user.click(button);
-  
-  // Assert
-  await waitFor(() => {
-    expect(screen.getByText('Success')).toBeInTheDocument();
-  });
+  expect(screen.getByText(/added to cart/i)).toBeInTheDocument();
 });
 ```
 
-### E2E Tests (Playwright)
+### Async Testing
+
+For components that fetch data or have async behavior:
 
 ```javascript
-test('complete user journey', async ({ page }) => {
-  // Navigate
-  await page.goto('/');
+it('loads and displays products', async () => {
+  render(<Products />);
   
-  // Interact
-  await page.click('text=Product Name');
-  await page.fill('input[name="email"]', 'test@example.com');
+  expect(screen.getByText(/loading/i)).toBeInTheDocument();
   
-  // Assert
-  await expect(page.locator('text=Success')).toBeVisible();
+  const products = await screen.findByText(/midnight library/i);
+  expect(products).toBeInTheDocument();
 });
 ```
 
-## Mock Strategy
+## Backend Requirements
 
-### API Mocking
-
-Unit and component tests mock the API layer:
-```javascript
-vi.mock('../../services/api', () => ({
-  authAPI: {
-    login: vi.fn(() => Promise.resolve({ success: true })),
-  },
-}));
-```
-
-### No Mocking in E2E
-
-Playwright tests run against the real application with the real backend. This ensures production-like testing.
+Some component tests interact with mocked API endpoints. The tests use MSW (Mock Service Worker) to intercept API calls in tests.
 
 ## CI/CD Integration
 
 ### GitHub Actions Example
+
 ```yaml
 name: Tests
+
 on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
       
       - name: Install dependencies
         run: npm install
       
-      - name: Run unit tests
+      - name: Run tests
         run: npm test
       
       - name: Build
         run: npm run build
-      
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-      
-      - name: Run E2E tests
-        run: npm run test:e2e
 ```
 
 ## Debugging Tests
 
 ### Vitest Debugging
+
 ```bash
-# Run single test file
+# Run tests in watch mode
+npm test -- --watch
+
+# Run specific test file
 npm test cart.test.jsx
 
-# Run tests matching pattern
-npm test -- -t "shopping cart"
-
-# Show console.log output
-npm test -- --reporter=verbose
-```
-
-### Playwright Debugging
-```bash
-# Visual debugging with Playwright Inspector
-npm run test:e2e:ui
-
-# Run in headed mode (see browser)
-npm run test:e2e:headed
-
-# Debug specific test
-npx playwright test --debug -g "checkout"
-
-# View test report
-npx playwright show-report
+# Debug in VS Code
+# Add breakpoint, then run "Debug: JavaScript Debug Terminal"
+npm test
 ```
 
 ### Common Issues
 
-**Tests fail with "API_URL not configured"**
+**Tests fail but work in browser**
+- Check if mocks are properly configured
+- Verify test data matches production data
 - Ensure `.env` file exists with `VITE_API_URL`
 
-**E2E tests timeout**
-- Ensure dev server is running (`npm run dev`)
-- Increase timeout in `playwright.config.js`
-
 **Cart tests fail**
-- Clear localStorage: Tests do this automatically
-- Check if browser storage is available
+- Clear localStorage: `localStorage.clear()`
+- Check if CartContext is properly wrapped
 
 **Authentication tests fail**
-- Backend may not be running
-- Check test user credentials
-- Verify API endpoints
+- Verify API mocks return correct shape
+- Check if AuthContext is wrapped in tests
 
 ## Best Practices
 
-### ✅ DO
-
+### DO:
 - Test user behavior, not implementation
-- Use semantic queries (role, label, text)
-- Mock external dependencies
-- Keep tests focused and isolated
-- Test error states
-- Verify loading states
+- Use accessible selectors (`getByRole`, `getByLabelText`)
+- Keep tests simple and readable
+- Mock external dependencies (API, localStorage)
+- Test error states and edge cases
 
-### ❌ DON'T
-
-- Test internal component state
-- Use CSS selectors when semantic options exist
+### DON'T:
+- Test implementation details
 - Make tests dependent on each other
 - Test third-party libraries
-- Mock too much in E2E tests
 - Ignore flaky tests
 
-## Performance
+## Test Performance
 
-### Typical Test Execution Times
-
+### Current Performance
 - **Unit tests**: ~2-5 seconds (all)
 - **Component tests**: ~5-10 seconds (all)
-- **E2E tests**: ~30-60 seconds (all)
 
 ### Optimization Tips
-
 - Run unit tests in watch mode during development
-- Run E2E tests before committing
 - Use `.only` to focus on specific tests during debugging
-- Parallelize E2E tests in CI (Playwright handles this)
 
 ## Test Data
 
-### Test Users
+### Mock Products
 ```javascript
-{
-  email: 'test@example.com',
-  password: 'TestPassword123!',
-  name: 'Test User'
-}
-```
-
-### Test Products
-Mock products are defined in `test-utils.jsx`:
-```javascript
-createMockProduct({
+const mockProduct = {
   id: 1,
-  title: 'Test Book',
-  author: 'Test Author',
-  price: 50.00,
-  stock_quantity: 10,
-})
+  title: 'The Midnight Library',
+  author: 'Matt Haig',
+  price: 65.00,
+  image: 'https://example.com/book.jpg',
+  category: 'Fiction',
+};
 ```
 
-## Maintenance
+### Mock User
+```javascript
+const mockUser = {
+  id: 1,
+  email: 'test@example.com',
+  name: 'Test User',
+};
+```
 
-### When to Update Tests
+### Mock Cart
+```javascript
+const mockCart = [
+  {
+    id: 1,
+    title: 'The Midnight Library',
+    price: 65.00,
+    quantity: 2,
+  },
+];
+```
 
-- After changing user-facing behavior
-- After adding new features
-- After fixing bugs (add regression test)
-- After updating dependencies
+## Pre-Deployment Checklist
 
-### When NOT to Update Tests
-
-- After refactoring (if behavior unchanged)
-- After changing CSS classes
-- After renaming variables
-- After code formatting
-
-## Production Deployment Checklist
-
-Before deploying to production:
-
+Before deploying:
 - [ ] All unit tests pass
 - [ ] All component tests pass
-- [ ] All E2E tests pass
 - [ ] Build succeeds (`npm run build`)
 - [ ] No console errors in test runs
-- [ ] Test coverage is adequate for critical paths
 
-## Support
+## Getting Help
 
-For issues or questions:
+If tests fail:
 1. Check test output for error messages
 2. Review this guide
-3. Check Playwright/Vitest documentation
+3. Check Vitest documentation
 4. Review test examples in the codebase
 
-## Future Enhancements
+---
 
-Potential additions (not in current scope):
-- Visual regression testing
-- Performance testing
-- Accessibility testing (automated)
-- Load testing
-- Cross-browser testing (Safari, Firefox)
-- Mobile device testing
-
-## Summary
-
-This testing suite provides **lean, production-focused coverage** for the Novella Book Store application. It prioritizes:
-
-1. **Critical user journeys** over exhaustive coverage
-2. **Real user behavior** over implementation details
-3. **Deterministic tests** over flaky tests
-4. **Fast feedback** over comprehensive suites
-5. **Production confidence** over test metrics
-
-Run tests frequently, keep them passing, and expand coverage only when genuine production risks are identified.
+**Need Quick Start?** See [TESTING_QUICKSTART.md](./TESTING_QUICKSTART.md)  
+**Test Results?** See [TEST_RESULTS.md](./TEST_RESULTS.md)
