@@ -47,6 +47,10 @@ export function AuthProvider({ children }) {
         setUser(response.user);
         return { success: true };
       }
+      // Handle API-level failures (200 OK but success: false)
+      const errorMessage = response.message || response.error || 'Registration failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };
@@ -64,6 +68,10 @@ export function AuthProvider({ children }) {
         setUser(response.user);
         return { success: true };
       }
+      // Handle API-level failures (200 OK but success: false)
+      const errorMessage = response.message || response.error || 'Login failed';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };

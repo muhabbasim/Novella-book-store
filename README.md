@@ -105,6 +105,9 @@ npm install
 # Start development server
 npm run dev
 
+# Run tests
+npm test
+
 # Build for production
 npm run build
 
@@ -120,7 +123,34 @@ The development server runs at `http://localhost:5173` (or next available port).
 |---------|-------------|
 | `npm run dev` | Start dev server with hot reload |
 | `npm run build` | Production build to `dist/` |
-| `npm run preview` | Preview production build |   
+| `npm run preview` | Preview production build |
+| `npm test` | Run unit and component tests |
+| `npm run test:ui` | Interactive test UI |
+| `npm run test:e2e` | Run E2E tests (requires backend) |
+
+### Testing
+
+This project includes a comprehensive testing suite covering all critical customer scenarios:
+
+- **Unit Tests**: Cart logic, calculations, and utilities
+- **Component Tests**: Authentication, checkout, product browsing
+- **E2E Tests**: Complete customer journeys in real browser
+
+For detailed testing documentation:
+- **[TESTING_QUICKSTART.md](./TESTING_QUICKSTART.md)** - Quick reference
+- **[TEST_GUIDE.md](./TEST_GUIDE.md)** - Complete testing guide
+- **[TEST_RESULTS.md](./TEST_RESULTS.md)** - Test coverage report
+
+```bash
+# Run all tests
+npm test
+
+# Watch mode during development
+npm test -- --watch
+
+# E2E tests (requires backend running)
+npm run test:e2e
+```   
 
 ---
 
